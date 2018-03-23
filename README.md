@@ -1,281 +1,55 @@
+## Unit 6 | Assignment - What's the Weather Like?
 
-#Observations
-#1. Temperatures are higher in cities close to the equator.
-#2. Cloudiness % has no correlation to proximity to the equator.
-#3. Windspeed (mph) is higher north of the equator.
+## Background
 
+Whether financial, political, or social -- data's true power lies in its ability to answer questions definitively. So let's take what you've learned about Python requests, APIs, and JSON traversals to answer a fundamental question: "What's the weather like as we approach the equator?"
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-import openweathermapy as ow
-from citipy import citipy
-import requests as req
-import pandas as pd
-```
+Now, we know what you may be thinking: _"Duh. It gets hotter..."_ 
 
+But, if pressed, how would you **prove** it? 
 
-```python
-api_key = "0ab81223680991db65d9f94f266e6ae0"
-url = "http://api.openweathermap.org/data/2.5/weather?"
-units = "imperial"
+![Equator](equatorsign.png)
 
-# Build partial query URL
-query_url = url + "appid=" + api_key + "&units=" + units + "&q="
-```
+## WeatherPy
 
+In this example, you'll be creating a Python script to visualize the weather of 500+ cities across the world of varying distance from the equator. To accomplish this, you'll be utilizing a [simple Python library](https://pypi.python.org/pypi/citipy), the [OpenWeatherMap API](https://openweathermap.org/api), and a little common sense to create a representative model of weather across world cities.
 
-```python
-# Select random coodindates and unique cities
-lat = []
-lon = []
-for x in range(1500):
-    lat.append(np.random.uniform(-90, 90,1))
-    lon.append(np.random.uniform(-180, 180,1))
-coordinates = list(zip(lat,lon))
-    
-cities = []
-for coordinate_pair in coordinates:
-    lat, lon = coordinate_pair
-    city = citipy.nearest_city(lat, lon)
-    cities.append(city.city_name)
-    
-cities = list(set(cities))
-```
+Your objective is to build a series of scatter plots to showcase the following relationships:
 
+* Temperature (F) vs. Latitude
+* Humidity (%) vs. Latitude
+* Cloudiness (%) vs. Latitude
+* Wind Speed (mph) vs. Latitude
 
-```python
-weather_data = []
+Your final notebook must:
 
-# Loop through the list of cities and perform a request for data on each
-for city in cities:
-    response = req.get(query_url + city).json()
-    weather_data.append(response)
-```
+* Randomly select **at least** 500 unique (non-repeat) cities based on latitude and longitude.
+* Perform a weather check on each of the cities using a series of successive API calls. 
+* Include a print log of each city as it's being processed with the city number, city name, and requested URL.
+* Save both a CSV of all data retrieved and png images for each scatter plot.
 
+As final considerations:
 
-```python
-# Stores city data
-name = []
-date = []
-temp = []
-humidity = []
-windspeed = []
-cloudiness = []
-latitude = []
-longitude = []
-country = []
+* You must use the Matplotlib library.
+* You must include a written description of three observable trends based on the data. 
+* You must use proper labeling of your plots, including aspects like: Plot Titles (with date of analysis) and Axes Labels.
+* You must include an exported markdown version of your Notebook called  `README.md` in your GitHub repository.  
+* See [Example Solution](WeatherPy_Example.pdf) for a reference on expected format. 
 
-for city in weather_data:
-    try:
-        name.append(city['name'])
-        date.append(city['dt'])
-        temp.append(city['main']['temp_max'])
-        humidity.append(city['main']['humidity'])
-        windspeed.append(city['wind']['speed'])
-        cloudiness.append(city['clouds']['all'])
-        latitude.append(city['coord']['lat'])
-        longitude.append(city['coord']['lon'])
-        country.append(city['sys']['country'])
-    except:
-            
-        continue
-```
+## Hints and Considerations
 
+* You may want to start this assignment by refreshing yourself on 4th grade geography, in particular, the [geographic coordinate system](http://desktop.arcgis.com/en/arcmap/10.3/guide-books/map-projections/about-geographic-coordinate-systems.htm). 
 
-```python
-# Display the City Data Frame 
-citydata = {"City": name, "Cloudiness":cloudiness, "Country": country, "Date": date,"Humidity": humidity, "Lat": latitude,
-           "Lng": longitude, "Max Temp": temp, "Wind Speed": windspeed} 
-citydata = pd.DataFrame(citydata)
-citydata.to_csv('City Data.csv')
-citydata.head()
-```
+* Next, spend the requisite time necessary to study the OpenWeatherMap API. Based on your initial study, you should be able to answer  basic questions about the API: Where do you request the API key? Which Weather API in particular will you need? What URL endpoints does it expect? What JSON structure does it respond with? Before you write a line of code, you should be aiming to have a crystal clear understanding of your intended outcome.
 
+* Though we've never worked with the [citipy Python library](https://pypi.python.org/pypi/citipy), push yourself to decipher how it works, and why it might be relevant. Before you try to incorporate the library into your analysis, start by creating simple test cases outside your main script to confirm that you are using it correctly. Too often, when introduced to a new library, students get bogged down by the most minor of errors -- spending hours investigating their entire code -- when, in fact, a simple and focused test would have shown their basic utilization of the library was wrong from the start. Don't let this be you!
 
+* Part of our expectation in this challenge is that you will use critical thinking skills to understand how and why we're recommending the tools we are. What is Citipy for? Why would you use it in conjunction with the OpenWeatherMap API? How would you do so?
 
+* In building your script, pay attention to the cities you are using in your query pool. Are you getting coverage of the full gamut of latitudes and longitudes? Or are you simply choosing 500 cities concentrated in one region of the world? Even if you were a geographic genius, simply rattling 500 cities based on your human selection would create a biased dataset. Be thinking of how you should counter this. (Hint: Consider the full range of latitudes).
 
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
+* Lastly, remember -- this is a challenging activity. Push yourself! If you complete this task, then you can safely say that you've gained a strong mastery of the core foundations of data analytics and it will only go better from here. Good luck!
 
-    .dataframe thead th {
-        text-align: left;
-    }
+## Copyright
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>City</th>
-      <th>Cloudiness</th>
-      <th>Country</th>
-      <th>Date</th>
-      <th>Humidity</th>
-      <th>Lat</th>
-      <th>Lng</th>
-      <th>Max Temp</th>
-      <th>Wind Speed</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Bria</td>
-      <td>8</td>
-      <td>CF</td>
-      <td>1515292252</td>
-      <td>63</td>
-      <td>6.54</td>
-      <td>21.99</td>
-      <td>56.17</td>
-      <td>6.87</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Vaini</td>
-      <td>0</td>
-      <td>IN</td>
-      <td>1515292253</td>
-      <td>78</td>
-      <td>15.34</td>
-      <td>74.49</td>
-      <td>66.61</td>
-      <td>2.62</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Belyy Yar</td>
-      <td>75</td>
-      <td>RU</td>
-      <td>1515290400</td>
-      <td>77</td>
-      <td>53.60</td>
-      <td>91.39</td>
-      <td>-2.21</td>
-      <td>1.50</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Pisco</td>
-      <td>0</td>
-      <td>PE</td>
-      <td>1515290400</td>
-      <td>83</td>
-      <td>-13.71</td>
-      <td>-76.20</td>
-      <td>69.80</td>
-      <td>13.87</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Basoko</td>
-      <td>88</td>
-      <td>CD</td>
-      <td>1515292255</td>
-      <td>58</td>
-      <td>1.23</td>
-      <td>23.61</td>
-      <td>79.75</td>
-      <td>5.75</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-# Temperature (F) vs. Latitude plot
-plt.scatter(citydata["Lat"], citydata["Max Temp"], marker="o", color="navy")
-
-# Incorporate the other graph properties
-plt.title("City Latitude plot vs. Max Temperature (F)")
-plt.ylabel("Max Temperature (F)")
-plt.xlabel("Latitude")
-plt.grid(True)
-
-# Save the figure
-plt.savefig("MaxTemperatureLatitude.png")
-
-# Show plot
-plt.show()
-
-```
-
-
-![png](output_7_0.png)
-
-
-
-```python
-# Humidity (%) vs. Latitude plot
-plt.scatter(citydata["Lat"], citydata["Humidity"], marker="o", color="navy")
-
-# Incorporate the other graph properties
-plt.title("City Latitude plot vs. Humidity (%)")
-plt.ylabel("Humidity (%)")
-plt.xlabel("Latitude")
-plt.grid(True)
-
-# Save the figure
-plt.savefig("HumidityLatitude.png")
-
-# Show plot
-plt.show()
-```
-
-
-![png](output_8_0.png)
-
-
-
-```python
-# Cloudiness (%) vs. Latitude
-plt.scatter(citydata["Lat"], citydata["Cloudiness"], marker="o", color="navy")
-
-# Incorporate the other graph properties
-plt.title("City Latitude plot vs. Cloudiness (%)")
-plt.ylabel("Cloudiness (%)")
-plt.xlabel("Latitude")
-plt.grid(True)
-
-# Save the figure
-plt.savefig("CloudinessLatitude.png")
-
-# Show plot
-plt.show()
-```
-
-
-![png](output_9_0.png)
-
-
-
-```python
-# Wind Speed (mph) vs. Latitude plot
-plt.scatter(citydata["Lat"], citydata["Wind Speed"], marker="o", color="navy")
-
-# Incorporate the other graph properties
-plt.title("City Latitude plot vs. Wind Speed (mph)")
-plt.ylabel("Windspeed (mph)")
-plt.xlabel("Latitude")
-plt.grid(True)
-
-# Save the figure
-plt.savefig("WindSpeedLatitude.png")
-
-# Show plot
-plt.show()
-```
-
-
-![png](output_10_0.png)
-
+Coding Boot Camp (C) 2016. All Rights Reserved.
